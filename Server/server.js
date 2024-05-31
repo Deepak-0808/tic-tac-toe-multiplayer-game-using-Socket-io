@@ -3,7 +3,7 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 
 const PORT = process.env.PORT || 3000;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:5174';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://tic-tac-toe-vert-sigma.vercel.app';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
