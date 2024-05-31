@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "http": "^0.0.1-security",
+    "nodemon": "^3.0.2",
+    "socket.io": "^4.7.3"
+  }
+}
