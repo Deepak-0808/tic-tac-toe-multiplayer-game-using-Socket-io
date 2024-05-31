@@ -1,28 +1,31 @@
-require('dotenv').config();
-const { createServer } = require('http');
-const { Server } = require('socket.io');
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const express = require("express");
+const cors = require("cors");
 
-const PORT = process.env.PORT || 3000;
-const ALLOWED_ORIGIN ='https://tic-tac-toe-vert-sigma.vercel.app';
+const app = express();
+app.use(cors({
+  origin: "https://tic-tac-toe-vert-sigma.vercel.app",
+}));
 
-const httpServer = createServer();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: ALLOWED_ORIGIN,
-    methods: ['GET', 'POST']
-  }
+    origin: "https://tic-tac-toe-vert-sigma.vercel.app",
+    methods: ["GET", "POST"],
+  },
 });
 
 const allUsers = {};
 const allRooms = [];
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   allUsers[socket.id] = {
     socket: socket,
-    online: true
+    online: true,
   };
 
-  socket.on('request_to_play', (data) => {
+  socket.on("request_to_play", (data) => {
     const currentUser = allUsers[socket.id];
     currentUser.playerName = data.playerName;
 
@@ -37,59 +40,58 @@ io.on('connection', (socket) => {
     }
 
     if (opponentPlayer) {
-      currentUser.playing = true;
-      opponentPlayer.playing = true;
-
       allRooms.push({
         player1: opponentPlayer,
-        player2: currentUser
+        player2: currentUser,
       });
 
-      currentUser.socket.emit('OpponentFound', {
+      currentUser.socket.emit("OpponentFound", {
         opponentName: opponentPlayer.playerName,
-        playingAs: 'circle'
+        playingAs: "circle",
       });
 
-      opponentPlayer.socket.emit('OpponentFound', {
+      opponentPlayer.socket.emit("OpponentFound", {
         opponentName: currentUser.playerName,
-        playingAs: 'cross'
+        playingAs: "cross",
       });
 
-      currentUser.socket.on('playerMoveFromClient', (data) => {
-        opponentPlayer.socket.emit('playerMoveFromServer', data);
+      currentUser.socket.on("playerMoveFromClient", (data) => {
+        opponentPlayer.socket.emit("playerMoveFromServer", {
+          ...data,
+        });
       });
 
-      opponentPlayer.socket.on('playerMoveFromClient', (data) => {
-        currentUser.socket.emit('playerMoveFromServer', data);
+      opponentPlayer.socket.on("playerMoveFromClient", (data) => {
+        currentUser.socket.emit("playerMoveFromServer", {
+          ...data,
+        });
       });
     } else {
-      currentUser.socket.emit('OpponentNotFound');
+      currentUser.socket.emit("OpponentNotFound");
     }
   });
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", function () {
     const currentUser = allUsers[socket.id];
-    if (currentUser) {
-      currentUser.online = false;
-      currentUser.playing = false;
+    currentUser.online = false;
+    currentUser.playing = false;
 
-      for (let index = 0; index < allRooms.length; index++) {
-        const { player1, player2 } = allRooms[index];
+    for (let index = 0; index < allRooms.length; index++) {
+      const { player1, player2 } = allRooms[index];
 
-        if (player1.socket.id === socket.id) {
-          player2.socket.emit('opponentLeftMatch');
-          break;
-        }
+      if (player1.socket.id === socket.id) {
+        player2.socket.emit("opponentLeftMatch");
+        break;
+      }
 
-        if (player2.socket.id === socket.id) {
-          player1.socket.emit('opponentLeftMatch');
-          break;
-        }
+      if (player2.socket.id === socket.id) {
+        player1.socket.emit("opponentLeftMatch");
+        break;
       }
     }
   });
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+httpServer.listen(3000, () => {
+  console.log("Server is listening on port 3000");
 });
