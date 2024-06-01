@@ -140,7 +140,7 @@ const App = () => {
     return (
       <div className="main-div">
         <button onClick={playOnlineClick} className="playOnline">
-          Play Online
+          Let's Play
         </button>
       </div>
     );
