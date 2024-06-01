@@ -3,6 +3,10 @@
 A simple multiplayer Tic-Tac-Toe game built using Socket.io, Node.js, and Express. Play with your friends in real-time!
 
 
+## Play Online
+
+You can play the game online at: [Tic-Tac-Toe Multiplayer Game](https://tic-tac-toe-vert-sigma.vercel.app/)
+
 ## Features
 
 - Real-time multiplayer Tic-Tac-Toe game
